@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Almohadas | AquisoloAlmohadas.net</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background-color: #f4f6f8;
+      color: #333;
+    }
+    header {
+      background-color: #1e3a8a;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .hero img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .benefits {
+      margin: 2rem 0;
+    }
+    .benefits li {
+      margin: 0.5rem 0;
+    }
+    .price-section {
+      font-size: 1.5rem;
+      margin: 1rem 0;
+      font-weight: bold;
+    }
+    .buy-button {
+      background-color: #10b981;
+      color: white;
+      padding: 1rem;
+      border: none;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .buy-button:hover {
+      background-color: #059669;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    .sticky-cart {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #ccc;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+    }
+    .sticky-cart button {
+      padding: 0.75rem 1.5rem;
+      background-color: #1d4ed8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AquisoloAlmohadas.net</h1>
+    <p>Tu descanso empieza aquí 💤</p>
+  </header>
+
+  <div class="container">
+    <div class="hero">
+      <h1>Almohada Ortopédica Cervical</h1>
+      <!-- Cambia "almohada.jpg" por el nombre de tu imagen local -->
+      <img src="almohada.jpg" alt="Almohada ortopédica" />
+    </div>
+
+    <p>¿Te despiertas con dolor de cuello? Esta almohada ergonómica se adapta perfectamente a tu postura para ayudarte a dormir mejor desde la primera noche.</p>
+
+    <ul class="benefits">
+      <li>✔️ Alivia el dolor cervical</li>
+      <li>✔️ Mejora tu postura al dormir</li>
+      <li>✔️ Espuma viscoelástica de alta calidad</li>
+      <li>✔️ Envío gratis a toda España</li>
+      <li>✔️ Garantía de satisfacción 30 días</li>
+    </ul>
+
+    <div class="price-section">
+      Precio especial: <span style="color: #ef4444;">34,99 €</span>
+    </div>
+
+    <button id="toggleCartBtn" class="buy-button"></button>
+  </div>
+
+  <div class="sticky-cart">
+    <span id="cartStatus">🛒 0 productos en tu carrito</span>
+    <button onclick="checkout()">Finalizar compra</button>
+  </div>
+
+  <footer>
+    &copy; 2025 AquisoloAlmohadas.net - Todos los derechos reservados.<br>
+    Contacto: contacto@aquisoloalmohadas.net
+  </footer>
+
+  <script>
+    // Simulamos un carrito con localStorage
+    const cartKey = "almohada-cart";
+    const cartStatus = document.getElementById("cartStatus");
+    const toggleCartBtn = document.getElementById("toggleCartBtn");
+
+    function updateCartUI() {
+      const inCart = localStorage.getItem(cartKey) === "true";
+      cartStatus.textContent = inCart ? "🛒 1 producto en tu carrito" : "🛒 0 productos en tu carrito";
+      toggleCartBtn.textContent = inCart ? "Eliminar del carrito" : "Añadir al carrito";
+    }
+
+    toggleCartBtn.addEventListener("click", () => {
+      const inCart = localStorage.getItem(cartKey) === "true";
+      if (inCart) {
+        localStorage.removeItem(cartKey);
+      } else {
+        localStorage.setItem(cartKey, "true");
+      }
+      updateCartUI();
+    });
+
+    function checkout() {
+      const inCart = localStorage.getItem(cartKey) === "true";
+      if (!inCart) {
+        alert("Primero debes añadir el producto al carrito.");
+        return;
+      }
+      window.location.href = "https://checkout.stripe.com/pay/YOUR_CHECKOUT_SESSION_ID";
+    }
+
+    // Inicializar al cargar
+    updateCartUI();
+  </script>
+</body>
+</html>
