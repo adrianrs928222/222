@@ -1,46 +1,28 @@
-// server.js
 const express = require('express');
-const stripe = require('stripe')('TU_CLAVE_SECRETA_DE_STRIPE'); // <-- Sustituye esto
+const Stripe = require('stripe');
+const cors = require('cors');
+const path = require('path');
+
+const stripe = Stripe('sk_live_TU_CLAVE_SECRETA'); // Cambia por tu clave secreta
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware para servir archivos estáticos (como index.html y almohada.jpg)
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/crear-sesion-checkout', async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
-      shipping_address_collection: {
-        allowed_countries: ['ES', 'PT'],
-      },
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            display_name: 'Envío estándar (48–72 h)',
-            type: 'fixed_amount',
-            fixed_amount: {
-              amount: 650, // 6,50 € en céntimos
-              currency: 'eur',
-            },
-            delivery_estimate: {
-              minimum: { unit: 'business_day', value: 2 },
-              maximum: { unit: 'business_day', value: 4 },
-            },
-          },
-        },
-      ],
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
             currency: 'eur',
             product_data: {
               name: 'Almohada Ortopédica Cervical',
-              images: ['https://tusitio.com/almohada.jpg'], // o puedes dejarlo vacío
             },
-            unit_amount: 3499, // 34,99 € en céntimos
+            unit_amount: 3999,
           },
           quantity: 1,
         },
@@ -50,13 +32,14 @@ app.post('/crear-sesion-checkout', async (req, res) => {
       cancel_url: 'https://tusitio.com/cancelado',
     });
 
-    res.redirect(303, session.url);
-  } catch (err) {
-    console.error('Error al crear la sesión de Stripe:', err.message);
-    res.status(500).send('Error en el servidor');
+    res.json({ id: session.id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al crear la sesión' });
   }
 });
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor funcionando en http://localhost:${PORT}`);
+  console.log(`Servidor activo en http://localhost:${PORT}`);
 });
