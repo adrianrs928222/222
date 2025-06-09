@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Almohadas | AquisoloAlmohadas.net</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Almohadas | AquísoloAlmohadas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -97,14 +98,13 @@
 </head>
 <body>
   <header>
-    <h1>AquisoloAlmohadas.net</h1>
+    <h1>AquisoloAlmohadas</h1>
     <p>Tu descanso empieza aquí 💤</p>
   </header>
 
   <div class="container">
     <div class="hero">
       <h1>Almohada Ortopédica Cervical</h1>
-      <!-- Cambia "almohada.jpg" por el nombre de tu imagen local -->
       <img src="almohada.jpg" alt="Almohada ortopédica" />
     </div>
 
@@ -119,7 +119,7 @@
     </ul>
 
     <div class="price-section">
-      Precio especial: <span style="color: #ef4444;">34,99 €</span>
+      Precio especial: <span style="color: #ef4444;">39,99 €</span>
     </div>
 
     <button id="toggleCartBtn" class="buy-button"></button>
@@ -131,12 +131,11 @@
   </div>
 
   <footer>
-    &copy; 2025 AquisoloAlmohadas.net - Todos los derechos reservados.<br>
+    &copy; 2025 AquisoloAlmohadas.net - Todos los derechos reservados.<br />
     Contacto: contacto@aquisoloalmohadas.net
   </footer>
 
   <script>
-    // Simulamos un carrito con localStorage
     const cartKey = "almohada-cart";
     const cartStatus = document.getElementById("cartStatus");
     const toggleCartBtn = document.getElementById("toggleCartBtn");
@@ -157,16 +156,37 @@
       updateCartUI();
     });
 
-    function checkout() {
+    async function checkout() {
       const inCart = localStorage.getItem(cartKey) === "true";
       if (!inCart) {
         alert("Primero debes añadir el producto al carrito.");
         return;
       }
-      window.location.href = "https://checkout.stripe.com/pay/YOUR_CHECKOUT_SESSION_ID";
+
+      const stripe = Stripe('pk_live_51RY84KDXKnXqgNc1d0b5ZM42IOQeSJ4jDsAM4tqnrXnSutSqBhUkKnGjM9uNJm6azK0BVAqL75axyLgHbjjPfm8D00ITlvIuTm');
+
+      try {
+        const response = await fetch('/crear-sesion-checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ producto: 'almohada-cervical' })
+        });
+
+        const session = await response.json();
+
+        if (session.id) {
+          await stripe.redirectToCheckout({ sessionId: session.id });
+        } else {
+          alert("No se pudo iniciar el proceso de pago.");
+        }
+      } catch (error) {
+        console.error('Error al iniciar Stripe Checkout:', error);
+        alert("Hubo un error al procesar el pago.");
+      }
     }
 
-    // Inicializar al cargar
     updateCartUI();
   </script>
 </body>
